@@ -17,7 +17,16 @@
 
 #define GP_BA		0x50004000
 #define GPIOA_PIN	GP_BA+0x010
+#define GPIOB_PIN	GP_BA+0x050
+#define GPIOC_PIN	GP_BA+0x090
 
+#ifdef PROTOTYPE
+	#define SWITCH_PORT	GPIOA_PIN
+	#define SWITCH_PIN	BIT10
+#else
+	#define SWITCH_PORT	GPIOB_PIN
+	#define SWITCH_PIN	BIT9
+#endif
 
 #define FMC_ISPCMD_READ        0x00     /*!< ISP Command: Read Flash       */
 #define FMC_ISPCMD_PROGRAM     0x21     /*!< ISP Command: Program Flash    */
@@ -87,7 +96,7 @@ int32_t main(void)
 
 	update_flash();
 
-	if ((inp32(GPIOA_PIN) & BIT10)!=0)	 {
+	if ((inp32(SWITCH_PORT) & SWITCH_PIN) != 0)	 {
 		goto MSDISP;
 	}
 
@@ -96,18 +105,20 @@ int32_t main(void)
 	while(1);
 
 MSDISP:				
-	outpw(0x50000044,0x0000000f);//for nuc1230 external rc pin enable
-
     /* Enable 12M Crystal */
-    SYSCLK->PWRCON.XTL12M_EN = 1;
-    RoughDelay(0x2000);                     
+	outp32(&SYSCLK->PWRCON,0x1C);
+    RoughDelay(0x4000);                     
 
     /* Enable PLL */
-    outp32(&SYSCLK->PLLCON, 0xC22E);
-    RoughDelay(0x2000);
+	outp32(&SYSCLK->AHBCLK,0x04);
+	outp32(&SYSCLK->CLKDIV,0x21);
+	outp32(&SYSCLK->PLLCON,0x00080418);
+	RoughDelay(0x4000);
 
-    /* Switch HCLK source to PLL */
-    SYSCLK->CLKSEL0.HCLK_S = 2;
+	/* Switch HCLK source to PLL */
+	outp32(&SYSCLK->CLKSEL0,0x3A);
+    RoughDelay(0x4000);                     
+
     
     /* Initialize USB Device function */
 

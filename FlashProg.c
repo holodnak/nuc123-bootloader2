@@ -125,14 +125,14 @@ void DataFlashWrite(uint32_t addr, uint32_t buffer)
         //FMC->ISPCON.ISPEN = 1;
         addr -= DATA_SECTOR_ADDRESS;
 
-        if (g_u8SecurityLockBit)
+//        if (g_u8SecurityLockBit)
         {
             myFMC_Erase(addr);
 
             FMC_ProgramPage(addr, (uint32_t *) buffer);
         }
         /* For Security Lock */
-        else
+/*        else
         {
             if (addr == 0) 
             {
@@ -145,7 +145,7 @@ void DataFlashWrite(uint32_t addr, uint32_t buffer)
             }
             
             FMC_ProgramPage(addr, (uint32_t *) buffer);        
-        }
+        }*/
         
         //FMC->ISPCON.ISPEN = 0;        
         //LOCKREG();
