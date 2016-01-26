@@ -105,7 +105,7 @@ int32_t main(void)
 	while(1);
 
 MSDISP:				
-    /* Enable 12M Crystal */
+    /* Enable internal osc */
 	outp32(&SYSCLK->PWRCON,0x1C);
     RoughDelay(0x4000);                     
 
